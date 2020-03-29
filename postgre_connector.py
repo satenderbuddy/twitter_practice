@@ -33,4 +33,14 @@ def view_my_followers():
         print('id: ', follower[0],'username: ', follower[1])
     close_conn(cur,conn)
 
-
+def create_my_following(name, u_name, follower_count, cur, conn):
+    sql = ''' INSERT INTO public.my_following(name, username, followers_count) 
+              values(%s,%s,%s) RETURNING id;'''
+    id = None
+    try:
+        cur.execute(sql,(name, u_name, follower_count))
+        id = cur.fetchone()[0]
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    return id
