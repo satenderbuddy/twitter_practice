@@ -7,7 +7,7 @@ menu = ''' ___________________________________________
 |___Welcome to Twitter Mod App______________|
 |       1: My Profile                       |
 |       2: My Followers list                |
-|       3: My Followings list                |
+|       3: My Followings list               |
 |       4: Refresh my followers list        |
 |       5: Refresh my following list        |
 |       6: Send request to 15 new people    |
@@ -16,18 +16,6 @@ menu = ''' ___________________________________________
 |       9: Retrieve excel of followers      |
 |___________________________________________|'''
 
-# def refresh_followers_db():
-    # api = twitter_connector.create_api()
-    # cur,conn = postgre_connector.connect()
-    # followers = tweepy.Cursor(api.followers).items()
-    # for item in followers:
-    #     try:
-    #         id = postgre_connector.create_my_follower(False, item.name, item.screen_name, item.followers_count, cur, conn)
-    #     except Exception as e:
-    #         print(e.error)
-    #         continue
-
-    # postgre_connector.close_conn(cur,conn)
 
 def view_my_profile(uname):
     api = twitter_connector.create_api()
@@ -61,22 +49,28 @@ def refresh_my_followers(me):
     api = twitter_connector.create_api()
     cur,conn = postgre_connector.connect()
     followers = tweepy.Cursor(api.followers).items()
+    followers_ids = []
     for item in followers:
-        try:
-            id = postgre_connector.create_my_follower(False, item.name, item.screen_name, item.followers_count, cur, conn)
-        except Exception as e:
-            print(e.error)
+        followers_ids.append(item.screen_name)
+        if not postgre_connector.is_in_db(item.screen_name):
+            try:
+                id = postgre_connector.create_my_follower(item.name, item.screen_name, item.followers_count, cur, conn)
+            except Exception as e:
+                print(e.error)
+                continue
+        else:
             continue
-
+    postgre_connector.del_left_users(followers_ids)
     postgre_connector.close_conn(cur,conn)
 
 def refresh_my_following(me):
+    refresh_my_followers(me)
     api = twitter_connector.create_api()
     cur,conn = postgre_connector.connect()
     followings = tweepy.Cursor(api.friends).items()
     for item in followings:
         try:
-            id = postgre_connector.create_my_following(item.name, item.screen_name, item.followers_count, cur, conn)
+            id = postgre_connector.create_my_following(item.name, item.screen_name, item.followers_count, postgre_connector.check_follow_back(item.screen_name), cur, conn)
         except Exception as e:
             print("error: ",e)
             print("exception type", type(e))
