@@ -1,8 +1,9 @@
 import psycopg2
+from  Configure import DatabaseConfig
 
 def connect():
     try:
-        conn = psycopg2.connect("dbname =twitter user=postgres password=1234")
+        conn = psycopg2.connect(DatabaseConfig.conn_string)
         cur = conn.cursor()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -24,14 +25,15 @@ def create_my_follower(name, u_name, follower_count, cur, conn):
         print(error)
     return id
 
-def view_my_followers():
-    cur,conn = connect()
-    sql = ''' Select id, user_name from public.my_followers where id is not null'''
-    cur.execute(sql)
-    followers = cur.fetchall()
-    for follower in followers:
-        print('id: ', follower[0],'username: ', follower[1])
-    close_conn(cur,conn)
+# def view_my_followers():
+#     cur,conn = connect()
+#     sql = ''' Select id, user_name from public.my_followers where id is not null'''
+#     cur.execute(sql)
+#     followers = cur.fetchall()
+#     print(len(followers))
+#     for follower in followers:
+#         print('id: ', follower[0],'username: ', follower[1])
+#     close_conn(cur,conn)
 
 def create_my_following(name, u_name, follower_count, follow_back, cur, conn):
     sql = ''' INSERT INTO public.my_following(name, username, followers_count, follow_back) 
@@ -61,7 +63,6 @@ def del_left_users(followers):
     cur,cunn = connect()
     cur.execute(sql)
     followers_db = cur.fetchall()
-    for_del = []
     for follower_db in followers_db:
         if follower_db[0] not in followers:
             delete_from_db(follower_db[0],cur,cunn)

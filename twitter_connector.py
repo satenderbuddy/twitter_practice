@@ -1,10 +1,10 @@
 import tweepy
-import CredentialsTwitter
+from Configure import TwitterConfig
 
 
 def create_api():
-    auth = tweepy.OAuthHandler(CredentialsTwitter.consumer_key, CredentialsTwitter.consumer_secret)
-    auth.set_access_token(CredentialsTwitter.access_token, CredentialsTwitter.access_token_secret)
+    auth = tweepy.OAuthHandler(TwitterConfig.consumer_key, TwitterConfig.consumer_secret)
+    auth.set_access_token(TwitterConfig.access_token, TwitterConfig.access_token_secret)
     api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
     try:
         api.verify_credentials()

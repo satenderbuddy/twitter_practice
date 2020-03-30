@@ -30,7 +30,7 @@ def view_my_followers(me):
     sql ="SELECT user_name, name from public.my_followers where id is not null"
     cur.execute(sql)
     followers = cur.fetchall()
-    print("My Followers: ")
+    print("My Followers: ", len(followers))
     for follower in followers:
         print("Name: " + follower[1] + "\tUser Name: " + follower[0])
     postgre_connector.close_conn(cur,conn)
