@@ -20,12 +20,13 @@ menu = ''' ___________________________________________
 def view_my_profile(uname):
     api = twitter_connector.create_api()
     me = api.get_user(uname)
-    print("Name:\t", me.name)
-    print("User Name:\t", me.screen_name)
-    print("Followers:\t", me.followers_count)
-    print("Following:\t", me.friends_count)
+    info = "Name:\t" + me.name
+    info += "     User Name:\t" + me.screen_name
+    info += "\nFollowers:\t" + str(me.followers_count)
+    info += "     Following:\t" + str(me.friends_count)
+    return info
 
-def view_my_followers(me):
+def view_my_followers():
     cur,conn = postgre_connector.connect()
     sql ="SELECT user_name, name from public.my_followers where id is not null"
     cur.execute(sql)
@@ -35,7 +36,7 @@ def view_my_followers(me):
         print("Name: " + follower[1] + "\tUser Name: " + follower[0])
     postgre_connector.close_conn(cur,conn)
 
-def view_my_following(me):
+def view_my_following():
     cur,conn = postgre_connector.connect()
     sql ="SELECT username, name from public.my_following where id is not null"
     cur.execute(sql)
@@ -45,7 +46,7 @@ def view_my_following(me):
         print("Name: " + follower[1] + "\tUser Name: " + follower[0])
     postgre_connector.close_conn(cur,conn)
 
-def refresh_my_followers(me):
+def refresh_my_followers():
     api = twitter_connector.create_api()
     cur,conn = postgre_connector.connect()
     followers = tweepy.Cursor(api.followers).items()
@@ -63,7 +64,7 @@ def refresh_my_followers(me):
     postgre_connector.del_left_users(followers_ids)
     postgre_connector.close_conn(cur,conn)
 
-def refresh_my_following(me):
+def refresh_my_following():
     refresh_my_followers(me)
     api = twitter_connector.create_api()
     cur,conn = postgre_connector.connect()
@@ -78,13 +79,13 @@ def refresh_my_following(me):
 
     postgre_connector.close_conn(cur,conn)
 
-def send_req_to_new_people(me):
+def send_req_to_new_people():
     print("Not Implemented yet")
 
-def unfollow_not_followback(me):
+def unfollow_not_followback():
     print("Not Implemented yet")
 
-def print_excel_followers(me):
+def print_excel_followers():
     print("Not Implemented yet")
 
 def print_excel_following(me):
